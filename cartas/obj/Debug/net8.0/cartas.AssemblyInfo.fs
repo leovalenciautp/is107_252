@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("cartas")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0f4bf8c0357396c881bfc29ab1c38c82fa1d5910")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2443bf52ab1185e6bf15c9dc3812fbf4f128f406")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("cartas")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("cartas")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]
