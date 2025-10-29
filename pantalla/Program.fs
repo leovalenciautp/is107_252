@@ -1,4 +1,5 @@
 ﻿open System
+open System.Threading
 
 let centerX = Console.BufferWidth/2
 let centerY = Console.BufferHeight/2
@@ -8,13 +9,30 @@ let originalBackground = Console.BackgroundColor
 
 Console.BackgroundColor <- ConsoleColor.Blue
 Console.Clear()
-Console.SetCursorPosition(centerX-4,centerY)
-Console.ForegroundColor <- ConsoleColor.Red
-Console.BackgroundColor <- ConsoleColor.Yellow
-Console.Write "Hola "
-Console.ForegroundColor <- ConsoleColor.Green
-Console.BackgroundColor <- ConsoleColor.Black
-Console.WriteLine "Mundo"
+
+let displayMessage x y color (mensaje:string) =
+    Console.ForegroundColor <- color
+    Console.SetCursorPosition(x,y)
+    Console.WriteLine mensaje
+
+//
+// Es importante que el eventLoop duerma unos cuantos
+// milisegundos para no ocupar el CPU todo el tiempo
+//
+let performSleep() =
+    Thread.Sleep 17
+
+displayMessage centerX centerY ConsoleColor.Yellow "🛸"
+
+Console.ReadLine() |> ignore
+
+[0..centerX-1]
+|> Seq.iter ( fun x -> 
+    displayMessage (centerX-x) centerY ConsoleColor.Yellow " "
+    displayMessage (centerX-x-1) centerY ConsoleColor.Yellow "🛸"
+    performSleep()
+)
+
 Console.ReadLine() |> ignore
 
 //
@@ -23,4 +41,8 @@ Console.ReadLine() |> ignore
 Console.ForegroundColor <- originalForeground
 Console.BackgroundColor <- originalBackground
 Console.Clear()
+
+//
+// Como leer las flechas del teclado y en general como leer cualquier tecla
+//
 
