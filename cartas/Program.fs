@@ -69,6 +69,20 @@ type Carta =
 | As of Palo
 | Numero of int*Palo
 
+
+//
+// List comprenhensions
+//
+let baraja = [
+    for palo in [Diamantes;Corazones;Picas;Treboles] do
+        for valor in [2..10] do
+            Numero (valor,palo)
+        K palo
+        Q palo
+        J palo
+        As palo
+]
+
 let rec obtenerPalo() =
     printf "Entra el Palo de tu carta (corazones, diamantes, picas, treboles): "
     match Console.ReadLine() with

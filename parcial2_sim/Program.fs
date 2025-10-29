@@ -153,6 +153,9 @@ let obtenerDatosDeAmigo() =
         Apodo = apodo
     }
 
+let adicionarAmigo amigo lista =
+    amigo :: lista
+    
 let rec obtenerDatos lista =
     let amigo = obtenerDatosDeAmigo()
     let nuevaLista = amigo :: lista

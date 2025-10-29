@@ -6,18 +6,18 @@
 //
 //
 open System 
-[1..20]
-|> Seq.map (fun e -> 2*e)
-|> Seq.sum
-|> ignore
+// [1..20]
+// |> Seq.map (fun e -> 2*e)
+// |> Seq.sum
+// |> ignore
 
 //
 // En F# reduce se llama en realidad fold
 //
-[1..20]
-|> Seq.map (fun e -> 2*e)
-|> Seq.fold (fun acumulador elemento -> acumulador + elemento) 0 // Esto es Seq.sum
-|> Console.WriteLine
+// [1..20]
+// |> Seq.map (fun e -> 2*e)
+// |> Seq.fold (fun acumulador elemento -> acumulador + elemento) 0 // Esto es Seq.sum
+// |> Console.WriteLine
 
 //
 // La operacion factorial (que en matemáticas se denota con !)
@@ -49,9 +49,9 @@ let rec obtenerFloat (mensaje:string) =
         printfn "Entrada Invalida"
         obtenerFloat mensaje
 
-obtenerFloat "Entra un número: "
-|> factorial
-|> Console.WriteLine
+// obtenerFloat "Entra un número: "
+// |> factorial
+// |> Console.WriteLine
 
 
 //
@@ -59,7 +59,19 @@ obtenerFloat "Entra un número: "
 // 
 // Fibonnacci
 
-[1..4]
-|> Seq.fold ( fun (a,b) _ -> (b,a+b)) (0,1)
-|> snd
-|> Console.WriteLine
+// [1..3]
+// |> Seq.fold ( fun (a,b) _ -> (b,a+b)) (0,1)
+// |> snd
+// |> Console.WriteLine
+
+let generarSequenciaFibonnacci n =
+    [1..(n-2)]
+    |> Seq.fold (fun acc _ ->
+        match acc with
+        | a :: b :: _ -> (a+b) :: acc
+        | _ -> acc
+    ) [1;0]
+    |> Seq.rev
+
+generarSequenciaFibonnacci 10
+|> Seq.iter Console.WriteLine
