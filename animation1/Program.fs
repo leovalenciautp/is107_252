@@ -50,6 +50,10 @@ let displayAlien state =
     displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "👽"
     state
 
+//
+// Modificar esta función para que el contador salga perfecto
+// con el último digito en la ultima columna.
+//
 let displayCounter state =
     displayMessage (state.Width-10) 0 ConsoleColor.Red $"{state.Counter}"
     state
