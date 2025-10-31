@@ -14,6 +14,12 @@ type ProgramState =
 | Running
 | Terminated
 
+
+type Missil = {
+    X: int
+    Y: int
+}
+
 //
 // Esto es un ejemplo de Scaffolding
 //
@@ -23,9 +29,7 @@ type State = {
     RocketX: int
     RocketY: int
     Counter: int
-    MissilX: int
-    MissilY: int
-    MissilOn: bool
+    Misiles: Missil list
     Tick: int
     Width: int
     Height: int
@@ -42,9 +46,7 @@ let initState() =
         AlienY = height/2
         RocketX = 0
         RocketY= 0
-        MissilX = 0
-        MissilY = 0
-        MissilOn = false
+        Misiles=[]
         ProgramState = Running
         Counter = 0
         Tick = 0 
@@ -69,9 +71,10 @@ let displayRocket state =
     state
 
 let displayMissil state =
-    if state.MissilOn then 
-        displayMessage state.MissilX state.MissilY ConsoleColor.Red "=>"
-    
+    state.Misiles
+    |> List.iter ( fun m ->
+        displayMessage m.X m.Y ConsoleColor.Red "=>"
+    )    
     state
 
 //
@@ -91,8 +94,10 @@ let cleanRocket state =
     state
 
 let cleanMissil state =
-    if state.MissilOn then
-        displayMessage state.MissilX state.MissilY ConsoleColor.Yellow "  "
+    state.Misiles
+    |> List.iter ( fun m -> 
+        displayMessage m.X m.Y ConsoleColor.Yellow "  "
+    )
     state
 let dormirUnRato() =
     Thread.Sleep 40
@@ -130,10 +135,8 @@ let updateScape key state =
 let updateMissilKeyboard key state =
     match key with 
     | ConsoleKey.Spacebar ->
-        if not state.MissilOn then 
-            {state with MissilOn=true;MissilX=state.AlienX+2;MissilY=state.AlienY}
-        else
-            state
+        let nuevoMisil = { X = state.AlienX+2; Y= state.AlienY}
+        {state with Misiles = nuevoMisil :: state.Misiles}
     | _ -> state
 let updateKeyboard state =
     if Console.KeyAvailable then
@@ -156,14 +159,14 @@ let updateClock state =
         state
 
 let updateMissilAnimation state =
-    if state.MissilOn then 
-        let nuevaX = state.MissilX+1
-        if nuevaX >= state.Width then
-            {state with MissilOn=false}
-        else
-            {state with MissilX= nuevaX}
-    else
-        state
+    let misiles =
+        state.Misiles
+        |> Seq.map ( fun m -> 
+            { m with X = m.X+1}
+        )
+        |> Seq.filter ( fun m -> m.X < state.Width-1)
+        |> Seq.toList
+    {state with Misiles=misiles}
 
 let updateState state =
     state
