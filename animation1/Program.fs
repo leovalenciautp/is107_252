@@ -34,6 +34,9 @@ type State = {
     Width: int
     Height: int
     ProgramState: ProgramState
+    EnemyX: int
+    EnemyY: int
+    EnemySpeed: float
 }
 
 let initState() =
@@ -49,7 +52,10 @@ let initState() =
         Misiles=[]
         ProgramState = Running
         Counter = 0
-        Tick = 0 
+        Tick = 0
+        EnemyX = width-10
+        EnemyY = 0 
+        EnemySpeed = Math.PI / 50.0
     }
 
 let displayMessage x y color (mensaje:string) =
@@ -68,6 +74,10 @@ let displayAlien state =
 
 let displayRocket state =
     displayMessage state.RocketX state.RocketY ConsoleColor.Yellow "🚀"
+    state
+
+let displayEnemy state =
+    displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "👾"
     state
 
 let displayMissil state =
@@ -91,6 +101,10 @@ let cleanAlien state =
 
 let cleanRocket state =
     displayMessage state.RocketX state.RocketY ConsoleColor.Yellow "  "
+    state
+
+let cleanEnemy state =
+    displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "  "
     state
 
 let cleanMissil state =
@@ -168,10 +182,16 @@ let updateMissilAnimation state =
         |> Seq.toList
     {state with Misiles=misiles}
 
+let updateEnemy state =
+    let newY = - float state.Height /2.0 * (Math.Cos (state.EnemySpeed*float state.Tick)- 1.0 )
+    {state with EnemyY = int newY}
+
+
 let updateState state =
     state
     |> updateTick
     |> updateClock
+    |> updateEnemy
     |> updateMissilAnimation
     |> updateKeyboard
 
@@ -181,6 +201,7 @@ let updateScreen state =
     |> displayRocket
     |> displayCounter
     |> displayMissil
+    |> displayEnemy
     |> ignore
 
 let clearObjects state =
@@ -188,6 +209,7 @@ let clearObjects state =
     |> cleanAlien
     |> cleanRocket
     |> cleanMissil
+    |> cleanEnemy
     |> ignore
 let rec mainLoop state =
     let newState = updateState state
