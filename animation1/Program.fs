@@ -200,7 +200,7 @@ let updateMissilAnimation state =
 
 let updateEnemy state =
     let newY = - float state.Height /2.0 * (Math.Cos (state.EnemySpeed*float state.Tick)- 1.0 )
-    {state with EnemyY = int newY}
+    {state with EnemyY = min (state.Height-1) (int newY)}
 
 let updateCollision state =
     if state.EnemyState = Visible then
