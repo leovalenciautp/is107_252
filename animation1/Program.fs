@@ -14,6 +14,10 @@ type ProgramState =
 | Running
 | Terminated
 
+type EnemyState =
+| Visible
+| Colision
+| Pausa
 
 type Missil = {
     X: int
@@ -37,7 +41,8 @@ type State = {
     EnemyX: int
     EnemyY: int
     EnemySpeed: float
-    EnemyVisible: bool
+    EnemyState: EnemyState
+    EnemyCounter: int
 }
 
 let initState() =
@@ -57,7 +62,8 @@ let initState() =
         EnemyX = width-10
         EnemyY = 0 
         EnemySpeed = Math.PI / 50.0
-        EnemyVisible= true
+        EnemyState = Visible
+        EnemyCounter = 0
     }
 
 let displayMessage x y color (mensaje:string) =
@@ -79,7 +85,7 @@ let displayRocket state =
     state
 
 let displayEnemy state =
-    if state.EnemyVisible then 
+    if state.EnemyState = Visible then 
         displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "👾"
     state
 
@@ -107,7 +113,7 @@ let cleanRocket state =
     state
 
 let cleanEnemy state =
-    if state.EnemyVisible then
+    if state.EnemyState = Visible then
         displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "  "
     state
 
@@ -176,6 +182,12 @@ let updateClock state =
     else
         state
 
+let updateEnemyCounter state =
+    if state.EnemyState = Pausa then
+        {state with EnemyCounter= state.EnemyCounter+1}
+    else
+        state
+
 let updateMissilAnimation state =
     let misiles =
         state.Misiles
@@ -191,12 +203,12 @@ let updateEnemy state =
     {state with EnemyY = int newY}
 
 let updateCollision state =
-    if state.EnemyVisible then
+    if state.EnemyState = Visible then
         let nuevosMisiles =
             state.Misiles
             |> List.filter ( fun m -> not (m.Y = state.EnemyY && (m.X+1) = state.EnemyX))
         if nuevosMisiles.Length <> state.Misiles.Length then
-            {state with Misiles = nuevosMisiles; EnemyVisible=false}
+            {state with Misiles = nuevosMisiles; EnemyState=Colision}
         else
             state  
     else
@@ -245,3 +257,18 @@ initState()
 
 Console.Clear()
 Console.CursorVisible <- true
+
+//
+// Heuristica
+//
+// -Pensar en estados del Enemy
+//  - Visible
+//  - ColisionDetectada
+//  - Pausa
+//  
+// Si el estado cambia a colision, arrancar un contador
+//  y cambiamos el estado a pausa.
+// 
+// En estado pausa miramos el contador, y cuando llegue a
+// dos segundos
+// Cambiamos el estado a visible
