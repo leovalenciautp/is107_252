@@ -14,10 +14,10 @@ type ProgramState =
 | Running
 | Terminated
 
-type EnemyState =
+type ObjectState =
 | Visible
-| Colision
-| Pausa
+| Colisionado
+| Pausado
 
 type Missil = {
     X: int
@@ -30,8 +30,8 @@ type Missil = {
 type State = {
     AlienX: int
     AlienY: int
-    RocketX: int
-    RocketY: int
+    AlienState: ObjectState
+    AlienColisionTime: int
     Counter: int
     Misiles: Missil list
     Tick: int
@@ -41,8 +41,12 @@ type State = {
     EnemyX: int
     EnemyY: int
     EnemySpeed: float
-    EnemyState: EnemyState
-    EnemyCounter: int
+    EnemyState: ObjectState
+    ColisionTime: int
+    Puntaje: int
+    MisilesEnemigos: Missil list
+    UltimoDisparo: int
+    EnemyAngle: float
 }
 
 let initState() =
@@ -53,8 +57,8 @@ let initState() =
         Height = height
         AlienX = width/2
         AlienY = height/2
-        RocketX = 0
-        RocketY= 0
+        AlienState = Visible
+        AlienColisionTime = 0
         Misiles=[]
         ProgramState = Running
         Counter = 0
@@ -63,7 +67,11 @@ let initState() =
         EnemyY = 0 
         EnemySpeed = Math.PI / 50.0
         EnemyState = Visible
-        EnemyCounter = 0
+        ColisionTime = 0
+        Puntaje = 0
+        MisilesEnemigos = []
+        UltimoDisparo =0
+        EnemyAngle = 3.0*Math.PI/2.0
     }
 
 let displayMessage x y color (mensaje:string) =
@@ -77,22 +85,31 @@ let displayJustifiedMessage x y color (mensaje:string) =
 
 
 let displayAlien state =
-    displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "👽"
+    match state.AlienState with
+    | Visible -> displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "👽"
+    | Colisionado -> displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "💥"
+    | _ -> ()
     state
 
-let displayRocket state =
-    displayMessage state.RocketX state.RocketY ConsoleColor.Yellow "🚀"
-    state
 
 let displayEnemy state =
-    if state.EnemyState = Visible then 
-        displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "👾"
+    match state.EnemyState with
+    | Visible -> displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "👾"
+    | Colisionado -> displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "💥"
+    | _ -> ()
     state
 
 let displayMissil state =
     state.Misiles
     |> List.iter ( fun m ->
         displayMessage m.X m.Y ConsoleColor.Red "=>"
+    )    
+    state
+
+let displayMisilesEnemigos state =
+    state.MisilesEnemigos
+    |> List.iter ( fun m ->
+        displayMessage m.X m.Y ConsoleColor.Yellow "<="
     )    
     state
 
@@ -104,17 +121,19 @@ let displayCounter state =
     displayJustifiedMessage (state.Width-1) 0 ConsoleColor.Yellow $"{state.Counter}"
     state
 
+let displayPuntaje state =
+    displayMessage 0 0 ConsoleColor.Cyan $"Puntaje: {state.Puntaje}"
+    state
 let cleanAlien state =
-    displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "  "
+    match state.AlienState with
+    | Visible | Colisionado -> displayMessage state.AlienX state.AlienY ConsoleColor.Yellow "  "
+    | _ -> ()
     state 
 
-let cleanRocket state =
-    displayMessage state.RocketX state.RocketY ConsoleColor.Yellow "  "
-    state
-
 let cleanEnemy state =
-    if state.EnemyState = Visible then
-        displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "  "
+    match state.EnemyState with
+    | Visible | Colisionado -> displayMessage state.EnemyX state.EnemyY ConsoleColor.Yellow "  "
+    | _ -> ()
     state
 
 let cleanMissil state =
@@ -123,32 +142,31 @@ let cleanMissil state =
         displayMessage m.X m.Y ConsoleColor.Yellow "  "
     )
     state
+
+let cleanMisilesEnemigos state =
+    state.MisilesEnemigos
+    |> List.iter ( fun m -> 
+        displayMessage m.X m.Y ConsoleColor.Yellow "  "
+    )
+    state
 let dormirUnRato() =
     Thread.Sleep 40
 
 let updateAlienKeyboard key state =
-    match key with 
-    | ConsoleKey.UpArrow ->
-        {state with AlienY = max 0 (state.AlienY-1)}
-    | ConsoleKey.DownArrow ->
-        { state with AlienY = min (state.Height-1) (state.AlienY+1)}
-    | ConsoleKey.LeftArrow ->
-        { state with AlienX = max 0 (state.AlienX-1)}
-    | ConsoleKey.RightArrow ->
-        { state with AlienX = min (state.Width-2) (state.AlienX+1)}
-    | _ -> state
+    if state.AlienState = Visible then
+        match key with 
+        | ConsoleKey.UpArrow ->
+            {state with AlienY = max 0 (state.AlienY-1)}
+        | ConsoleKey.DownArrow ->
+            { state with AlienY = min (state.Height-1) (state.AlienY+1)}
+        | ConsoleKey.LeftArrow ->
+            { state with AlienX = max 0 (state.AlienX-1)}
+        | ConsoleKey.RightArrow ->
+            { state with AlienX = min (state.Width-2) (state.AlienX+1)}
+        | _ -> state
+    else 
+        state
 
-let updateRocketKeyboard key state =
-    match key with 
-    | ConsoleKey.W ->
-        {state with RocketY = max 0 (state.RocketY-1)}
-    | ConsoleKey.S ->
-        { state with RocketY = min (state.Height-1) (state.RocketY+1)}
-    | ConsoleKey.A ->
-        { state with RocketX = max 0 (state.RocketX-1)}
-    | ConsoleKey.D ->
-        { state with RocketX = min (state.Width-2) (state.RocketX+1)}
-    | _ -> state
 
 let updateScape key state =
     match key with 
@@ -157,18 +175,20 @@ let updateScape key state =
     | _ -> state
 
 let updateMissilKeyboard key state =
-    match key with 
-    | ConsoleKey.Spacebar ->
-        let nuevoMisil = { X = state.AlienX+2; Y= state.AlienY}
-        {state with Misiles = nuevoMisil :: state.Misiles}
-    | _ -> state
+    if state.AlienState = Visible then
+        match key with 
+        | ConsoleKey.Spacebar ->
+            let nuevoMisil = { X = state.AlienX+2; Y= state.AlienY}
+            {state with Misiles = nuevoMisil :: state.Misiles}
+        | _ -> state
+    else
+        state
 let updateKeyboard state =
     if Console.KeyAvailable then
         let tecla = Console.ReadKey(true)
         state 
         |> updateScape tecla.Key
         |> updateAlienKeyboard tecla.Key
-        |> updateRocketKeyboard tecla.Key
         |> updateMissilKeyboard tecla.Key
     else
         state
@@ -182,11 +202,6 @@ let updateClock state =
     else
         state
 
-let updateEnemyCounter state =
-    if state.EnemyState = Pausa then
-        {state with EnemyCounter= state.EnemyCounter+1}
-    else
-        state
 
 let updateMissilAnimation state =
     let misiles =
@@ -198,21 +213,81 @@ let updateMissilAnimation state =
         |> Seq.toList
     {state with Misiles=misiles}
 
+let updateMisilesEnemigos state =
+    let misiles =
+        state.MisilesEnemigos
+        |> Seq.map ( fun m -> 
+            { m with X = m.X-1}
+        )
+        |> Seq.filter ( fun m -> m.X >=0 )
+        |> Seq.toList
+    {state with MisilesEnemigos=misiles}
+
+
+let dispararMisilEnemigo state =
+    if state.Tick - state.UltimoDisparo >= 6 then
+        let nuevoMisil = { X = state.EnemyX-2; Y = state.EnemyY }
+        {state with MisilesEnemigos = nuevoMisil :: state.MisilesEnemigos;UltimoDisparo = state.Tick}
+    else
+        state
 let updateEnemy state =
-    let newY = - float state.Height /2.0 * (Math.Cos (state.EnemySpeed*float state.Tick)- 1.0 )
-    {state with EnemyY = min (state.Height-1) (int newY)}
+    if state.EnemyState = Visible then
+        let newY = - float state.Height /2.0 * (Math.Cos (state.EnemySpeed*float state.Tick)- 1.0 )
+        {state with EnemyY = min (state.Height-1) (int newY)}
+        |> dispararMisilEnemigo
+    else
+        state
 
 let updateCollision state =
-    if state.EnemyState = Visible then
+    match state.EnemyState with 
+    | Visible ->     
         let nuevosMisiles =
             state.Misiles
             |> List.filter ( fun m -> not (m.Y = state.EnemyY && (m.X+1) = state.EnemyX))
         if nuevosMisiles.Length <> state.Misiles.Length then
-            {state with Misiles = nuevosMisiles; EnemyState=Colision}
+            {state with 
+                Misiles = nuevosMisiles
+                EnemyState=Colisionado
+                ColisionTime = state.Tick
+                Puntaje = state.Puntaje+1
+            }
         else
-            state  
-    else
-        state
+            state
+    | Colisionado ->
+        if state.Tick - state.ColisionTime >= 25 then
+            {state with EnemyState = Pausado}
+        else
+            state
+    | Pausado ->
+        if state.Tick - state.ColisionTime >= 75 then
+            {state with EnemyState = Visible}
+        else
+            state
+
+let updateAlienCollision state =
+    match state.AlienState with 
+    | Visible ->     
+        let nuevosMisiles =
+            state.MisilesEnemigos
+            |> List.filter ( fun m -> not (m.Y = state.AlienY && (m.X) = state.AlienX))
+        if nuevosMisiles.Length <> state.MisilesEnemigos.Length then
+            {state with 
+                MisilesEnemigos = nuevosMisiles
+                AlienState=Colisionado
+                AlienColisionTime = state.Tick
+            }
+        else
+            state
+    | Colisionado ->
+        if state.Tick - state.AlienColisionTime >= 25 then
+            {state with AlienState = Pausado}
+        else
+            state
+    | Pausado ->
+        if state.Tick - state.AlienColisionTime >= 75 then
+            {state with AlienState = Visible}
+        else
+            state
 
 
 let updateState state =
@@ -221,23 +296,26 @@ let updateState state =
     |> updateClock
     |> updateEnemy
     |> updateMissilAnimation
+    |> updateMisilesEnemigos
     |> updateCollision
+    |> updateAlienCollision
     |> updateKeyboard
 
 let updateScreen state =
     state
     |> displayAlien
-    |> displayRocket
     |> displayCounter
     |> displayMissil
+    |> displayMisilesEnemigos
     |> displayEnemy
+    |> displayPuntaje
     |> ignore
 
 let clearObjects state =
     state
     |> cleanAlien
-    |> cleanRocket
     |> cleanMissil
+    |> cleanMisilesEnemigos
     |> cleanEnemy
     |> ignore
 let rec mainLoop state =
