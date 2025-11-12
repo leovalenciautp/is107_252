@@ -4,9 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Menu.fs" />
-    <Compile Include="GameOver.fs" /><Compile Include="Program.fs" />
-    
+    <Compile Include="GameOver.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

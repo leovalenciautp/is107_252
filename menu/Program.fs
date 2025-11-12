@@ -6,6 +6,7 @@
 
 module Leo.Main
 open App
+open App.Types
 open System
 
 Console.Clear()
@@ -15,6 +16,12 @@ let choice = Menu.mostrarMenu()
 
 Console.Clear()
 Console.CursorVisible <- true
-printfn $"El usuario eligio {choice}"
+
+let msg =
+    match choice with
+    | NewGame -> "Nuevo Juego"
+    | LoadGame -> "Cargar un juego"
+    | Exit -> "Salir"
+printfn $"El usuario eligio {msg}"
 
 

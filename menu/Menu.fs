@@ -1,5 +1,7 @@
 module App.Menu
 open System
+
+open App.Types
 open App.Utils
 
 type MenuState =
@@ -12,7 +14,7 @@ type State = {
     Y: int
     CursorX: int
     CursorIndex: int
-    Commands: string list
+    Commands: (MenuCommand*string) list
 }
 
 let initState() =
@@ -23,9 +25,9 @@ let initState() =
         CursorX = 8
         CursorIndex = 0
         Commands = [
-            "New Game"
-            "Load Game"
-            "Exit"
+            NewGame,"Nuevo Juego"
+            LoadGame,"Cargar Juego"
+            Exit,"Salir"
         ]
     }
 
@@ -34,7 +36,7 @@ let updateCursorScreen oldState newState =
     displayMessage newState.CursorX (newState.CursorIndex+newState.Y) ConsoleColor.Yellow "☠️"
 let updateMenuScreen state =
     state.Commands 
-    |> List.iteri (fun i c ->
+    |> List.iteri (fun i (_,c) ->
         displayMessage state.X (state.Y+i) ConsoleColor.Yellow c
     )
 
@@ -74,5 +76,6 @@ let mostrarMenu() =
     initState()
     |> mainLoop
     |> fun state ->
-        state.CursorIndex
+        let i = state.CursorIndex
+        fst state.Commands[i]
 
