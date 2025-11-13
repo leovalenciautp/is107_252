@@ -6,8 +6,12 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Utils.fs" />
-    <Compile Include="Menu.fs" /><Compile Include="MainMenu.fs" /><Compile Include="PauseMenu.fs" />
+    <Compile Include="Menu.fs" />
+    <Compile Include="MainMenu.fs" />
+    <Compile Include="PauseMenu.fs" />
     <Compile Include="GameOver.fs" />
+    <Compile Include="Juego.fs" />
+    <Compile Include="Navigator.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
