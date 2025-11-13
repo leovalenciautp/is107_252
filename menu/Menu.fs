@@ -8,27 +8,23 @@ type MenuState =
 | Active
 | Terminated
 
-type State = {
+type State<'c> = {
     MenuState: MenuState
     X: int
     Y: int
     CursorX: int
     CursorIndex: int
-    Commands: (MenuCommand*string) list
+    Commands: ('c*string) list
 }
 
-let initState() =
+let initState x y commands =
     {
         MenuState = Active
-        X = 10
-        Y = 10
-        CursorX = 8
+        X = x
+        Y = y
+        CursorX = x-2
         CursorIndex = 0
-        Commands = [
-            NewGame,"Nuevo Juego"
-            LoadGame,"Cargar Juego"
-            Exit,"Salir"
-        ]
+        Commands = commands
     }
 
 let updateCursorScreen oldState newState =
@@ -72,8 +68,8 @@ let rec mainLoop state =
         mainLoop newState
     else
         state
-let mostrarMenu() =
-    initState()
+let mostrarMenu x y commandos =
+    initState x y commandos
     |> mainLoop
     |> fun state ->
         let i = state.CursorIndex

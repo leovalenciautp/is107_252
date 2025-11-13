@@ -1,5 +1,10 @@
 module App.GameOver
 
-open System
-let mostrarMenu() =
-    Console.WriteLine "Menu de Game Over"
+open App.Types
+
+let mostrarMenu x y =
+    [
+        GameOverCommand.NewGame,"Empezar de Nuevo"
+        GameOverCommand.Exit,"Salir"
+    ]
+    |> Menu.mostrarMenu x y

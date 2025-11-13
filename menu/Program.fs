@@ -12,16 +12,15 @@ open System
 Console.Clear()
 Console.CursorVisible <- false
 
-let choice = Menu.mostrarMenu()
+let choice = GameOver.mostrarMenu 20 10
 
 Console.Clear()
 Console.CursorVisible <- true
 
 let msg =
     match choice with
-    | NewGame -> "Nuevo Juego"
-    | LoadGame -> "Cargar un juego"
-    | Exit -> "Salir"
+    | GameOverCommand.NewGame -> "Nuevo Juego"
+    | GameOverCommand.Exit -> "Salir del juego"
 printfn $"El usuario eligio {msg}"
 
 
