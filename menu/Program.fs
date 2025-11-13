@@ -12,8 +12,9 @@ open System
 Console.Clear()
 Console.CursorVisible <- false
 
-Navigator.mostrar()
-
+//Navigator.mostrar()
+Utils.displayMessageGigante 5 5 ConsoleColor.Green "Alien"
+Console.ReadLine() |> ignore
 Console.Clear()
 Console.CursorVisible <- true
 
