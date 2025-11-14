@@ -4,17 +4,14 @@
 // Modules and Namespaces
 //
 
-module Leo.Main
-open App
-open App.Types
+module App.Main
 open System
 
 Console.Clear()
 Console.CursorVisible <- false
 
-//Navigator.mostrar()
-Utils.displayMessageGigante 5 5 ConsoleColor.Green "Alien"
-Console.ReadLine() |> ignore
+Navigator.mostrar()
+
 Console.Clear()
 Console.CursorVisible <- true
 

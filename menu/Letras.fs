@@ -10,6 +10,36 @@ let letraA =
         "█    █"
     |]
 
+let letraC =
+    [|
+        " ████ "
+        "█    █"
+        "█"
+        "█"
+        "█    █"
+        " ████"
+    |]
+
+let letraG =
+    [|
+        " ████ "
+        "█    █"
+        "█"
+        "█  ███ "
+        "█    █"
+        " ████"
+    |]
+
+let letraO =
+    [|
+        " ████ "
+        "█    █"
+        "█    █"
+        "█    █"
+        "█    █"
+        " ████"
+    |]
+
 let letraL =
     [|
         "█"
@@ -51,6 +81,66 @@ let letraN =
         "█    █"
     |]
 
+let letraT =
+    [|
+        "█████ "
+        "  █"
+        "  █"
+        "  █"
+        "  █"
+        "  █"
+    |]
+
+let letraK =
+    [|
+        "█    █"
+        "█   █ "
+        "████"
+        "█   █"
+        "█    █"
+        "█     █"
+    |]
+
+let letraSpc =
+    [|
+        " "
+        " "
+        " "
+        " "
+        " "
+        " "
+    |]
+
+let letraM =
+    [|
+        "█    █"
+        "██  ██"
+        "█ ██ █"
+        "█    █"
+        "█    █"
+        "█    █"
+    |]
+
+let letraR =
+    [|
+        "█████ "
+        "█    █"
+        "█    █"
+        "█████"
+        "█   █"
+        "█    █"
+    |]
+
+let letraV =
+    [|
+        "█    █"
+        "█    █"
+        "█    █"
+        "█    █"
+        " █  █"
+        "  ██"
+    |]
+
 let mapaDeLetras =
     [
         'A',letraA
@@ -58,6 +148,15 @@ let mapaDeLetras =
         'I',letraI
         'N',letraN
         'E',letraE
+        ' ',letraSpc
+        'T',letraT
+        'K',letraK
+        'C',letraC
+        'O',letraO
+        'M',letraM
+        'R',letraR
+        'V',letraV
+        'G',letraG
     ]
     |> Map.ofList
 

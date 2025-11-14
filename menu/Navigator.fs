@@ -30,7 +30,9 @@ let initState() =
 
 let showMainMenu state =
     Console.Clear()
-    match MainMenu.mostrarMenu 20 10 with
+    Utils.displayMessageGigante 5 0 ConsoleColor.Green "Alien"
+    Utils.displayMessageGigante 5 8 ConsoleColor.Red "Attack"
+    match MainMenu.mostrarMenu 20 16 with
     | MenuCommand.NewGame -> 
         {state with NavigatorState = ShowJuego}
     | MenuCommand.LoadGame ->
@@ -43,10 +45,11 @@ let showMainMenu state =
 let showJuego state =
     Console.Clear()
     Juego.mostrarJuego()
-    {state with NavigatorState=ShowPausa}
+    {state with NavigatorState=ShowGameOver}
 
 let showGameOver state =
     Console.Clear()
+    Utils.displayMessageGigante 0 0 ConsoleColor.Red "Game Over"
     match GameOver.mostrarMenu 20 10 with
     | GameOverCommand.NewGame -> 
         {state with NavigatorState = ShowJuego}
